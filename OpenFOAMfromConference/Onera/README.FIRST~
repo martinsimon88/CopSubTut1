@@ -1,0 +1,44 @@
+How to run me:
+
+
+
+foamCleanTutorials
+
+foamCleanPolyMesh
+
+fluent3DMeshToFoam ../../../meshes_and_geometries/fluent_wingbody/ascii.msh 
+
+checkMesh
+
+cp system/boundary constant/polyMesh/
+
+transformPoints -scale '(0.001 0.001 0.001)'
+
+decomposePar
+
+mpirun -np 4 renumberMesh -overwrite -parallel 
+
+mpirun -np 4 sonicFoam -parallel > log.sonicFoam | tail -f log.sonicFoam
+
+mpirun -np 4 Mach -parallel 
+
+reconstructPar
+
+paraFoam
+
+
+
+
+
+Note:
+
+This case corresponds to:
+
+ALTITUDE = 2000 m
+ALTITUDE PRESSURE = 80000 Pa
+ALTITUDE SPEED OF SOUND = 331.53
+ALTITUDE TEMPERATURE = 275.15
+
+INLET MACH NUMBER = 0.7
+
+

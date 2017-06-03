@@ -1,0 +1,222 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     sonicFoam;
+
+//startFrom       startTime;
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         0.0001;
+
+deltaT          0.0000001;
+
+writeControl    timeStep;
+writeInterval   50;
+
+/*
+writeControl    adjustableRunTime;
+writeInterval   0.1;
+*/
+
+purgeWrite      10;
+
+secondaryWriteControl    cpuTime;
+secondaryWriteInterval   3600; 
+secondaryPurgeWrite      1; 
+
+writeFormat     ascii;
+
+writePrecision  8;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+// ************************************************************************* //
+// ************************************************************************* //
+
+functions
+(
+
+///////////////////////////////////////////////////////////////////////////
+domainminandmax
+{
+    type fieldMinMax;
+    //type banana;
+
+    functionObjectLibs ("libfieldFunctionObjects.so");
+
+    enabled true;
+
+    mode component;
+
+    outputControl timeStep;
+    outputInterval 1;
+
+    log true;
+
+    fields (p U T rho e);
+}
+///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+forcesall
+{ 
+    type        forceCoeffs;
+    functionObjectLibs ( "libforces.so" );Wheelbase 
+    outputControl timeStep;
+    outputInterval 1;
+
+    patches     ( "WING" "FAIRING" "FUSELAGE" "COCKPIT" "NOSE");
+    
+    pName       p;
+    UName       U;
+    //rhoName     rhoInf;    // Indicates incompressible
+    log         true;
+    rhoInf      1.00499;           // Redundant for incompressible
+    
+    liftDir     (0 0 1);
+    dragDir     (1 0 0);
+    CofR        (0.157 0 -0.03392);  // Axle midpoint on ground
+    pitchAxis   (0 1 0);
+    
+    magUInf     280;
+
+    /*
+    lRef        7;               // estimatedlength
+    Aref        383.6896;        // Estimated
+    */
+    
+    lRef        0.14;          // estimatedlength
+    Aref        0.1454;        // Estimated for total model
+    
+}
+///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+forceswing
+{  
+    type        forceCoeffs;
+    functionObjectLibs ( "libforces.so" );Wheelbase 
+    outputControl timeStep;
+    outputInterval 1;
+
+    patches     ( "WING");
+    
+    pName       p;
+    UName       U;
+    //rhoName     rhoInf;    // Indicates incompressible
+    log         true;
+    rhoInf      1.00499;          // Redundant for incompressible
+    
+    liftDir     (0 0 1);
+    dragDir     (1 0 0);
+    CofR        (0.157 0 -0.03392);  // Axle midpoint on ground
+    pitchAxis   (0 1 0);
+    
+    magUInf     280;
+
+    /*
+    lRef        7;               // estimatedlength
+    Aref        383.6896;        // Estimated
+    */
+    
+    lRef        0.14;          // estimatedlength
+    Aref        0.1454;        // Estimated for total model
+    
+}
+///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+additional_fields
+{
+    type writeRegisteredObject;
+    functionObjectLibs ( "libIOFunctionObjects.so" );
+
+    //Remember, when in doubt, use bananas        
+    //objectNames ("bananas");
+        
+    //objectNames ("rho" "e");	//There is an error with e.  Need to track it.
+    objectNames ("rho");
+
+    enabled         true;
+
+    outputControl     outputTime;
+
+    //outputControl   timeStep;
+    //outputInterval  1;
+}
+///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////
+fieldAverage
+{
+    type            fieldAverage;
+    functionObjectLibs ("libfieldFunctionObjects.so");
+    enabled         false;
+    outputControl   outputTime;
+
+    //outputControl   timeStep;
+    //outputInterval  100;
+
+    //cleanRestart true;
+
+    //timeStart       20;
+    //timeEnd         200;
+
+    fields
+    (
+        U
+        {
+            mean        on;
+            prime2Mean  on;
+            base        time;
+        }
+
+        p
+        {
+            mean        on;
+            prime2Mean  on;
+            base        time;
+        }
+
+        rho
+        {
+            mean        on;
+            prime2Mean  on;
+            base        time;
+        }
+
+        T
+        {
+            mean        on;
+            prime2Mean  on;
+            base        time;
+        }
+    );
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+);

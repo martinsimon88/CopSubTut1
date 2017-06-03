@@ -1,0 +1,87 @@
+How to run me:
+
+
+
+#To run in parallel:
+
+rm *.obj > /dev/null 2>&1
+
+rm 0/* > /dev/null 2>&1
+
+foamClearPolyMesh
+
+foamCleanTutorials
+
+
+
+#Whole body
+#surfaceOrient constant/triSurface/N2A_Hybrid.stl '(1e9 1e9 1e9)' constant/triSurface/new.stl
+
+#surfaceTransformPoints -scale '(0.3048 0.3048 0.3048)' constant/triSurface/N2A_Hybrid.stl constant/triSurface/surfacemesh.stl
+#cp constant/triSurface/N2A_Hybrid.stl constant/triSurface/surfacemesh.stl
+
+#Half body
+surfaceTransformPoints -scale '(0.3048 0.3048 0.3048)' constant/triSurface/half.stl constant/triSurface/scale.stl
+cp constant/triSurface/scale.stl constant/triSurface/surfacemesh.stl
+rm constant/triSurface/scale.stl
+
+#If you use this utility additionally to checking the surface, it will create two additional files
+#What are those files? How can you use then?
+surfaceCheck constant/triSurface/surfacemesh.stl
+
+
+
+surfaceFeatureExtract -noFunctionObjects
+
+
+
+blockMesh
+
+decomposePar
+
+mpirun -np 4 snappyHexMesh -parallel 
+
+mpirun -np 4 checkMesh -parallel -time 3 
+
+reconstructParMesh
+
+checkMesh -latestTime
+
+patchSummary -latestTime
+
+
+
+#The option -builtin will let you visualize the decomposed mesh and the boundary layer fields saved in 3
+paraFoam -builtin
+
+
+
+#To transfer the final mesh to constant polyMesh
+
+cp 3/polyMesh/* constant/polyMesh/
+
+rm -rf 1 > /dev/null 2>&1
+
+rm -rf 2 > /dev/null 2>&1
+
+rm -rf 3 > /dev/null 2>&1
+
+createPatch -overwrite
+
+mirrorMesh -noFunctionObjects
+
+checkMesh
+
+paraFoam
+
+
+
+
+NOTE0:
+Geometry generated using OpenVSP
+
+NOTE1:
+Use the option -overwrite to avoid the step of transferring the final mesh to the folder constant/polyMesh
+
+NOTE2:
+Before running the simulation you will need to decompose the fiels.  You can use the option -force

@@ -1,0 +1,27 @@
+Sref = 0.67
+Cref = 0.41
+Bref = 1
+X_cg = 0.337
+Y_cg = 0
+Z_cg = 0.035
+Mach = 0.1
+AoA = 10
+Beta = 0.000000
+Vinf = 30
+Rho = 1.225
+ReCref = 3E+06
+ClMax = -1.000000
+Symmetry = NO
+FarDist = -1.000000
+NumWakeNodes = 0
+WakeIters = 5
+NumberOfRotors= 1
+PropElement_1
+1
+1.15 0 0
+1.00  0.00 0.00
+3.25
+0.5
+-2600
+0.057797173
+0.07248844

@@ -1,0 +1,32 @@
+fluent3DMeshToFoam ../fluent_oneraM6/ascii.msh 
+
+checkMesh
+
+cp system/boundary constant/polyMesh/
+
+transformPoints -scale '(0.001 0.001 0.001)'
+
+renumberMesh -overwrite
+
+sonicFoam
+
+sonicFoam -postProcess -func MachNo
+
+paraFoam
+
+
+
+
+
+Note:
+
+This is a very simplified case with alminar flow, constant transport equation etc
+
+ALTITUDE = 2000 m
+ALTITUDE PRESSURE = 80000 Pa
+ALTITUDE SPEED OF SOUND = 331.53
+ALTITUDE TEMPERATURE = 275.15
+
+INLET MACH NUMBER = 0.7
+
+
